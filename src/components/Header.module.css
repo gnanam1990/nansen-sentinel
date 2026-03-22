@@ -1,0 +1,97 @@
+.hdr {
+  position: sticky; top: 0; z-index: 200;
+  height: 52px;
+  padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(6,8,9,0.97);
+  border-bottom: 1px solid var(--bd);
+  backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--orb);
+  font-size: 14px; font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.bracket { color: var(--tm); }
+.name { color: var(--g); text-shadow: 0 0 20px rgba(0,255,136,0.4); }
+
+.tag {
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 2px;
+  background: var(--g5);
+  border: 1px solid var(--g4);
+  color: var(--g3);
+  padding: 2px 8px; border-radius: 1px;
+  margin-left: 4px;
+}
+
+.right {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.demoBadge {
+  font-size: 9px; letter-spacing: 1.5px;
+  background: rgba(255,183,0,0.1);
+  border: 1px solid var(--a2);
+  color: var(--a);
+  padding: 3px 8px; border-radius: 1px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.statusPill {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; letter-spacing: 1px;
+  color: var(--tm);
+  border: 1px solid var(--bd);
+  padding: 4px 10px; border-radius: 1px;
+}
+
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--tm);
+}
+
+.dotActive {
+  background: var(--g);
+  box-shadow: 0 0 8px var(--g);
+  animation: pulseDot 1.8s infinite;
+}
+
+@keyframes pulseDot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+.statusTxt { color: var(--t); }
+
+.callCounter {
+  font-size: 10px; letter-spacing: 1px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  padding: 4px 10px; border-radius: 1px;
+  color: var(--tm);
+}
+
+.callNum { color: var(--g); font-weight: 700; }
+
+.keysBtn {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 0.5px;
+  padding: 0 12px; height: 28px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  color: var(--tm);
+  cursor: pointer; border-radius: 1px;
+  transition: all 0.15s;
+}
+
+.keysBtn:hover { border-color: var(--g); color: var(--g); }

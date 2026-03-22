@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npx vite:*)",
+      "Bash(pkill:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(npm:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.nansen.ai)",
+      "WebFetch(domain:api.nansen.ai)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(du:*)",
+      "Bash(wc:*)",
+      "Bash(gh:*)",
+      "Bash(winget install:*)",
+      "Bash(export:*)",
+      "Bash(git:*)"
+    ]
+  }
+}

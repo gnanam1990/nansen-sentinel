@@ -1,0 +1,159 @@
+/* ═══════════════════════════════════════════════════════════
+   NANSEN SENTINEL — GLOBAL STYLES
+   Matrix-core terminal aesthetic. Phosphor green on carbon.
+   ═══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #060809;
+  --s1:      #090c0a;
+  --s2:      #0c1009;
+  --s3:      #101508;
+  --s4:      #141a10;
+  --bd:      #1a2a1c;
+  --bd2:     #243628;
+  --bd3:     #2e4430;
+
+  --g:       #00ff88;
+  --g2:      #00cc66;
+  --g3:      #008844;
+  --g4:      #004422;
+  --g5:      #001a0d;
+
+  --c:       #00e5ff;
+  --c2:      #00aacc;
+  --c3:      #003344;
+
+  --a:       #ffb700;
+  --a2:      #cc8800;
+  --a3:      #332200;
+
+  --r:       #ff3355;
+  --r2:      #cc1133;
+  --r3:      #330011;
+
+  --p:       #aa66ff;
+  --p2:      #7733cc;
+  --p3:      #220044;
+
+  --t:       #7a9e82;
+  --t2:      #a8c8b0;
+  --t3:      #d0ecd8;
+  --tm:      #3a5a42;
+  --td:      #1e3022;
+
+  --mono:    'Share Tech Mono', 'Courier New', monospace;
+  --orb:     'Orbitron', sans-serif;
+  --space:   'Space Mono', monospace;
+
+  --radius:  2px;
+  --gap:     14px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--t2);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+#root { min-height: 100vh; }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bd2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bd3); }
+
+/* text selection */
+::selection { background: var(--g4); color: var(--g); }
+
+/* utility */
+.pos { color: var(--g) !important; }
+.neg { color: var(--r) !important; }
+.neu { color: var(--tm) !important; }
+.am  { color: var(--a) !important; }
+.cy  { color: var(--c) !important; }
+.pu  { color: var(--p) !important; }
+.wh  { color: var(--t3) !important; }
+
+.mono { font-family: var(--mono); }
+.orb  { font-family: var(--orb); }
+
+/* fade-up animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px var(--g); }
+  50%       { opacity: 0.3; transform: scale(0.7); box-shadow: none; }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* grid background */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.022) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.radial-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 75% 15%, rgba(0,255,136,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 15% 85%, rgba(0,229,255,0.04) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.4) 0%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* skeleton loader */
+.skel {
+  background: linear-gradient(90deg, var(--s2) 25%, var(--s3) 50%, var(--s2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius);
+  height: 12px;
+  display: block;
+}
