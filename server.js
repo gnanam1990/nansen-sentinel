@@ -10,6 +10,32 @@ const app = express()
 const PORT = 3001
 const NANSEN_BASE = 'https://api.nansen.ai/api/v1'
 
+// Quote/settlement assets — when one side of a DEX trade is one of these, the
+// "interesting" token is the other side, and the trade direction is determined
+// relative to it (bought the token => BUY, sold the token => SELL).
+const QUOTE_TOKENS = new Set([
+  'USDC', 'USDT', 'DAI', 'TUSD', 'USDE', 'FDUSD', 'BUSD', 'USDP', 'PYUSD', 'GUSD',
+  'ETH', 'WETH', 'BTC', 'WBTC', 'CBBTC', 'SOL', 'WSOL', 'BNB', 'WBNB', 'MATIC', 'WMATIC',
+])
+
+// Classify a DEX trade into a direction + the token of interest.
+// The Nansen dex-trades schema always populates both token_bought_symbol and
+// token_sold_symbol and provides no explicit buy/sell field, so we derive it.
+function classifyDexTrade(t) {
+  const bought = t.token_bought_symbol || ''
+  const sold = t.token_sold_symbol || ''
+  const boughtIsQuote = QUOTE_TOKENS.has(bought.toUpperCase())
+  const soldIsQuote = QUOTE_TOKENS.has(sold.toUpperCase())
+
+  // Bought a real token using a quote asset => accumulation (BUY of `bought`).
+  if (soldIsQuote && !boughtIsQuote) return { action: 'BUY', token: bought }
+  // Sold a real token for a quote asset => distribution (SELL of `sold`).
+  if (boughtIsQuote && !soldIsQuote) return { action: 'SELL', token: sold }
+  // Token-for-token (or quote-for-quote): treat the bought side as the position
+  // being entered, which matches how the trade is conventionally read.
+  return { action: 'BUY', token: bought || sold }
+}
+
 app.use(cors())
 app.use(express.json())
 
@@ -234,16 +260,20 @@ function transformResponse(command, apiData, params) {
         success: true,
         data: {
           chain,
-          trades: (apiData.data || []).map(t => ({
-            wallet: t.trader_address,
-            label: t.trader_address_label || 'Smart Money',
-            action: t.token_bought_symbol ? 'BUY' : 'SELL',
-            token_bought: t.token_bought_symbol,
-            token_sold: t.token_sold_symbol,
-            amount_usd: t.trade_value_usd || 0,
-            timestamp: t.block_timestamp,
-            chain: t.chain || chain,
-          })),
+          trades: (apiData.data || []).map(t => {
+            const { action, token } = classifyDexTrade(t)
+            return {
+              wallet: t.trader_address,
+              label: t.trader_address_label || 'Smart Money',
+              action,
+              token,
+              token_bought: t.token_bought_symbol,
+              token_sold: t.token_sold_symbol,
+              amount_usd: t.trade_value_usd || 0,
+              timestamp: t.block_timestamp,
+              chain: t.chain || chain,
+            }
+          }),
         },
       }
 
