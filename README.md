@@ -1,201 +1,101 @@
-# NANSEN SENTINEL
-### Autonomous On-Chain Intelligence Agent
+# Nansen Sentinel
 
-> Built for the **Nansen CLI Build Challenge 2026** — #NansenCLI @nansen_ai
+> An on-chain intelligence dashboard that surfaces smart-money flows, wallet profiles, and token signals, with a built-in demo mode that runs without any API keys.
 
-[![Demo](https://img.shields.io/badge/LIVE_DEMO-nansen--sentinel.vercel.app-00ff88?style=for-the-badge)](https://nansen-sentinel.vercel.app)
-[![CLI](https://img.shields.io/badge/Nansen_CLI-v1.12.0-00cc66?style=for-the-badge)](https://www.npmjs.com/package/nansen-cli)
-[![AI](https://img.shields.io/badge/Claude_AI-claude--sonnet--4-00e5ff?style=for-the-badge)](https://anthropic.com)
+## Overview
 
----
+Nansen Sentinel is a single-page web app for exploring on-chain "smart money" activity. It pulls smart-money netflows, DEX trades, wallet holdings, token screener data, and per-wallet profiles from an on-chain intelligence data API, and layers optional natural-language summaries on top via configurable LLM providers. It ships with a **demo mode** (enabled by default) that returns rich, realistic mock data so the entire interface works end-to-end with no keys configured. Point it at a real data API key and an LLM key to switch to live data.
 
-## What Is SENTINEL?
+## Features
 
-SENTINEL is the **world's first autonomous on-chain intelligence agent** built on the Nansen CLI. Unlike dashboards that wait for you to click buttons, SENTINEL runs a continuous **ReAct loop** — Observe → Reason → Act → Report — pulling real blockchain data, reasoning about it with Claude AI, and briefing you in real time.
+- **Smart Money Scanner** — smart-money netflows, recent DEX trades, and top holdings across multiple chains.
+- **Wallet Roaster** — multi-call wallet profile (balance, PnL, transactions, labels, related wallets) with an optional LLM-generated narrative summary.
+- **Agent Arena** — multiple LLM personas (bull / bear / degen / verdict) reason over the same token data and produce contrasting takes.
+- **Alpha Briefing** — aggregates several data calls into a single LLM-written market briefing.
+- **Mission Feed & Alerts** — an autonomous observe → reason → report loop that scans data on an interval and raises alerts.
+- **CLI Feed** — a live terminal-style log of every data call the app makes.
+- **Demo mode** — default-on mock data for both the data API and LLM responses, so the app is fully usable offline / without keys. This is a real, first-class mode, not a stub.
+- **Configurable providers** — LLM provider, model, and base URL are set in the in-app API Keys panel; data and LLM keys can also come from server environment variables.
 
-**6 capabilities in one app:**
+## Tech stack
 
-| Module | What It Does | CLI Calls |
-|---|---|---|
-| 🔴 **Mission Feed** | Autonomous ReAct agent loop — runs 24/7, fires alerts | 3 per cycle |
-| 🔵 **SM Scanner** | Smart money flows, DEX trades, whale holdings | 4 per scan |
-| 🟡 **Wallet Roaster** | 5-call wallet profile + Claude AI roast or analyst report | 5 per wallet |
-| 🟣 **Agent Arena** | Bull vs Bear vs Degen AI agents debate any token live | 4 per debate |
-| 🟢 **Alpha Briefing** | 10-call pipeline → Claude writes hedge fund morning note | 10 per briefing |
-| 🔴 **Alerts** | Real-time alerts from autonomous agent | automatic |
-
-**Total documented CLI calls: 25** — all listed in the CLI Feed tab.
-
----
-
-## Quick Start (Demo Mode — No Keys Required)
-
-```bash
-# Clone
-git clone https://github.com/YOUR_USERNAME/nansen-sentinel.git
-cd nansen-sentinel
-
-# Install
-npm install
-
-# Run (demo mode — realistic mock data, no API keys needed)
-npm run dev
-```
-
-Open http://localhost:5173 — everything works in Demo Mode.
-
----
-
-## Live Mode Setup (Real Nansen CLI Data)
-
-### 1. Install Nansen CLI
-
-```bash
-npm install -g nansen-cli
-nansen login  # enter your API key from app.nansen.ai/api
-```
-
-### 2. Get API Keys
-
-| Key | Where to Get |
-|---|---|
-| Nansen API Key | [app.nansen.ai/api](https://app.nansen.ai/api) — free tier available |
-| Anthropic API Key | [console.anthropic.com](https://console.anthropic.com) — powers Claude AI features |
-
-### 3. Configure in the App
-
-Click **⚙ API KEYS** in the top right → enter your keys → toggle off Demo Mode.
-
-### 4. Set Environment Variables (for Vercel deployment)
-
-```bash
-NANSEN_API_KEY=your_nansen_key_here
-```
-
----
-
-## Deploy to Vercel (One Command)
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel --prod
-
-# Set environment variable
-vercel env add NANSEN_API_KEY
-```
-
-Done. Your app is live at `https://your-project.vercel.app`.
-
----
+- **Frontend:** React 18, Vite 5
+- **Dev backend:** Express 4 (with `cors`), Node.js (ESM), `dotenv`
+- **Tooling:** `concurrently` (runs Vite + the API server together), `@vitejs/plugin-react`
+- **Deploy target:** Vercel (Vite framework preset)
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     NANSEN SENTINEL                         │
-│                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │ Mission  │  │   SM     │  │ Wallet   │  │  Agent   │   │
-│  │  Feed    │  │ Scanner  │  │ Roaster  │  │  Arena   │   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
-│       │             │             │              │          │
-│  ┌────▼─────────────▼─────────────▼──────────────▼─────┐   │
-│  │           /api/nansen (Vercel Serverless)            │   │
-│  └────────────────────────┬────────────────────────────┘   │
-│                           │                                 │
-│  ┌────────────────────────▼────────────────────────────┐   │
-│  │         nansen-cli (npm install -g nansen-cli)       │   │
-│  │  nansen research sm netflow | token screener | ...   │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │     Claude AI (api.anthropic.com/v1/messages)        │   │
-│  │  Wallet Roast | Agent Arena | Alpha Briefing         │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
+- `index.html` / `src/` — the React 18 + Vite single-page app. `src/App.jsx` hosts the tabbed UI; feature panels live in `src/components/`; data/LLM access and mock data live in `src/lib/`; the autonomous loop and call log live in `src/hooks/`.
+- `server.js` — the local Express API server (port 3001). It proxies two concerns:
+  - `POST /api/nansen` — translates app commands into on-chain data API requests, calls the upstream REST API, and reshapes responses for the UI.
+  - `POST /api/claude` and `POST /api/claude-stream` — forward prompts to a selected LLM provider (non-streaming and SSE streaming). Several provider backends are supported, including OpenAI-compatible HTTP endpoints and a locally hosted model server.
+- `vite.config.js` — the Vite dev server proxies `/api` to `http://localhost:3001`, so the client and API server run side by side in development.
+- `vercel.json` — Vite build config and SPA rewrites for deployment. Note: the API routing here expects a serverless function under `api/`, which is not yet committed to this repo (see Status).
 
----
+## Getting started
 
-## Full CLI Call Inventory (25 Documented Calls)
+### Prerequisites
+
+- Node.js 18+ (the deploy config targets the Node.js 18 runtime)
+- npm
+
+### Installation
 
 ```bash
-# SM SCANNER (6 calls)
-nansen research sm netflow --chain ethereum --timeframe 24h --limit 20
-nansen research sm netflow --chain solana --timeframe 24h --limit 20
-nansen research sm netflow --chain base --timeframe 24h --limit 20
-nansen research token screener --chain solana --limit 20
-nansen research sm holdings --chain ethereum --limit 15
-nansen research sm dex-trades --chain base --limit 10
-
-# WALLET ROASTER (5 calls per wallet)
-nansen research profiler balance --address <addr> --chain ethereum
-nansen research profiler pnl --address <addr>
-nansen research profiler txs --address <addr> --limit 30
-nansen research profiler tags --address <addr>
-nansen research profiler connected-wallets --address <addr>
-
-# AGENT ARENA (4 calls per debate)
-nansen research sm netflow --chain solana --timeframe 24h
-nansen research token screener --chain solana --limit 20
-nansen research sm dex-trades --chain solana --limit 20
-nansen research token holders --chain solana --limit 10
-
-# ALPHA BRIEFING (10 calls)
-nansen research sm netflow --chain ethereum --timeframe 24h
-nansen research sm netflow --chain solana --timeframe 24h
-nansen research sm netflow --chain base --timeframe 24h
-nansen research token screener --chain solana --limit 10
-nansen research token screener --chain ethereum --limit 10
-nansen research sm holdings --chain ethereum --limit 10
-nansen research sm dex-trades --chain solana --limit 20
-nansen research perp --symbol BTC
-nansen research perp --symbol ETH
-nansen research perp --symbol SOL
-
-# AUTONOMOUS AGENT (3 per cycle, continuous)
-nansen research sm netflow --chain <chain> --timeframe 24h
-nansen research sm dex-trades --chain <chain> --limit 10
-nansen research token screener --chain <chain> --limit 10
+npm install
 ```
 
----
+### Configuration
 
-## Tech Stack
+All keys are optional in demo mode. To run against live data, provide them either through the in-app **API Keys** panel or as environment variables read by `server.js`. Create a `.env` file (it is gitignored) with the names you need:
 
-- **Frontend:** React 18 + Vite (zero config)
-- **Data:** Nansen CLI v1.12.0 (`npm install -g nansen-cli`)
-- **AI:** Claude claude-sonnet-4 via Anthropic API
-- **Backend:** Vercel Serverless Function (Node.js 18)
-- **Deploy:** Vercel (one command)
-- **Chains:** Ethereum, Solana, Base, BNB, Arbitrum, Hyperliquid
-
----
-
-## Contest Eligibility
-
-- [x] Uses Nansen CLI (`nansen-cli` npm package)
-- [x] 25+ documented CLI calls (well above 10-call minimum)
-- [x] Code available in this repo
-- [x] Live demo deployed on Vercel
-- [x] Tags: @nansen_ai #NansenCLI
-
----
-
-## Judging Criteria — Why This Wins
-
-| Criterion | Evidence |
+| Variable | Purpose |
 |---|---|
-| **Creativity** | First submission combining autonomous ReAct agent + wallet roaster + 3-agent debate + briefing in one app |
-| **Real-world usefulness** | Every module solves a real daily problem for on-chain traders |
-| **Technical depth** | 25 CLI calls, multi-agent Claude prompting, streaming terminal, autonomous loop |
-| **Clear presentation** | The app IS the demo — live, shareable, no setup for judges |
+| `NANSEN_API_KEY` | Key for the on-chain intelligence data API (used by `/api/nansen`). |
+| `ANTHROPIC_API_KEY` | Default LLM provider key. |
+| `OPENAI_API_KEY` | LLM key used when the OpenAI-compatible provider is selected. |
+| `KIMI_API_KEY` | LLM key used when the Kimi provider is selected. |
 
----
+The local model provider runs without a key. Per-request keys entered in the API Keys panel take precedence over environment variables. Never commit real key values.
+
+### Running
+
+```bash
+npm run dev          # runs Vite (port 5173) and the API server (port 3001) together
+npm run dev:client   # Vite dev server only
+npm run dev:server   # Express API server only (port 3001)
+```
+
+Open http://localhost:5173. With demo mode left on (the default), every panel works immediately. Open the **API Keys** panel to enter keys, choose an LLM provider, and turn demo mode off for live data.
+
+### Build
+
+```bash
+npm run build        # production build into dist/
+npm run preview      # serve the production build locally
+```
+
+## Usage
+
+The app is driven entirely through the UI tabs:
+
+- **SM Scanner** — pick a chain and view netflows, DEX trades, and holdings.
+- **Wallet Roaster** — enter an address to fetch its profile and generate a summary.
+- **Agent Arena** — choose a token and run the multi-persona debate.
+- **Alpha Briefing** — generate an aggregated market briefing.
+- **Mission Feed / Alerts** — start the autonomous loop to scan on an interval and raise alerts.
+- **CLI Feed** — inspect the exact data calls being made.
+
+## Status
+
+Working MVP. The React + Vite frontend and the local Express dev server (`server.js`) are functional, and demo mode provides a complete, usable experience without any keys. Live mode works when a valid data API key and an LLM key are supplied.
+
+Known gaps:
+
+- `vercel.json` references a serverless function at `api/nansen.js`, but that file is not present in the repo. Local development uses `server.js` instead; a Vercel deployment of the API routes would require adding the matching serverless function(s).
+- There are no automated tests.
 
 ## License
 
-MIT © 2026 — Built for the Nansen CLI Build Challenge
+No license specified.
